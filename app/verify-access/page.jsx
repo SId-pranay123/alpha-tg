@@ -64,15 +64,20 @@ import AlphaAccessButton from '../../components/AlphaAccessButton';
 
 export default function VerifyAccess() {
   const [checking, setChecking] = useState(true);
+  const [redirectAttempted, setRedirectAttempted] = useState(false);
+
   
   useEffect(() => {
     // Check if already has access, redirect if so
-    if (hasAccessCookie()) {
-      redirect('/alpha');
+    const hasLocalAccess = localStorage.getItem('alpha_verified') === 'true';
+    
+    if (hasLocalAccess && !redirectAttempted) {
+      setRedirectAttempted(true);
+      window.location.href = '/alpha';
     } else {
       setChecking(false);
     }
-  }, []);
+  }, [redirectAttempted]);
   
   if (checking) {
     return (

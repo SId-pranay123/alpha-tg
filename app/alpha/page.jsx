@@ -165,14 +165,18 @@ export default function Alpha() {
 
   useEffect(() => {
     // Client-side verification with fallback
-    const hasAccess = hasAccessCookie();
+    const hasLocalAccess = localStorage.getItem('alpha_verified') === 'true';
     // console.log("Checking alpha access:", hasAccess);
     
-    if (!hasAccess) {
-      // console.log("No access, redirecting to verification");
-      window.location.href = '/verify-access'; // Use window.location for more reliable redirects
+    if (!hasLocalAccess) {
+      // Clear any redirect flags to prevent loops
+      localStorage.removeItem('redirecting_to_verify');
+      localStorage.setItem('redirecting_to_verify', 'true');
+      window.location.href = '/verify-access';
     } else {
+      // We have access
       setAuthorized(true);
+      setIsLoading(false);
     }
   }, []);
 

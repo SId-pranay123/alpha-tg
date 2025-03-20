@@ -41,18 +41,14 @@ export default function AlphaAccessButton() {
       // console.log("result: ", result);
       
       if (result.success) {
-        localStorage.setItem('alpha_verified', 'true');
   
-        // Add a longer delay to ensure the cookie is set before redirecting
+        // Store success in localStorage as our primary method
+        localStorage.setItem('alpha_verified', 'true');
+                
+        // Add a short pause then redirect
         setTimeout(() => {
-          if (hasAccessCookie() || localStorage.getItem('alpha_verified') === 'true') {
-            // console.log("Redirecting to alpha page");
-            window.location.href = '/alpha'; // Use window.location instead of router
-          } else {
-            // console.log("Cookie not found after verification");
-            setError("Authentication successful but session not established. Please try again.");
-          }
-        }, 1500); // Longer delay
+          window.location.href = '/alpha';
+        }, 1500);
       } else {
         setError(result.message || 'Access denied. You do not own the required NFT.');
       }
