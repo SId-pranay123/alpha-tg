@@ -92,7 +92,7 @@ export default function AlphaAccessButton() {
             rel="noopener noreferrer"
             className="inline-flex items-center text-white hover:text-violet-200 font-medium transition-colors"
           >
-            Get Phantom <ExternalLink className="ml-1 h-4 w-4" />
+             <p className="ml-1 h-4 w-4">Get Phantom</p>
           </a>
         </div>
       )}
