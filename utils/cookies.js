@@ -5,9 +5,8 @@ export function getCookie(name) {
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) return parts.pop().split(';').shift();
     return null;
-  }
-  
-  export function hasAccessCookie() {
+}
+
+export function hasAccessCookie() {
     return getCookie('alpha_access') === 'true';
-  }
-  
+}

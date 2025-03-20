@@ -56,7 +56,6 @@
 
 "use client";
 
-// pages/verify-access.jsx
 import { useEffect, useState } from 'react';
 import { redirect } from 'next/navigation';
 import Head from 'next/head';

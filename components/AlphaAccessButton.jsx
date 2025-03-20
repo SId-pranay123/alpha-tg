@@ -1,10 +1,14 @@
+
+"use client";
 import { useState, useEffect } from 'react';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+
 import { hasAccessCookie } from '../utils/cookies';
 import { connectPhantomWallet, isPhantomInstalled } from '../utils/phantom';
 import { verifyWalletAccess } from '../utils/api';
 
 export default function AlphaAccessButton() {
+  const router = useRouter();
   const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState(null);
   const [phantomAvailable, setPhantomAvailable] = useState(false);
@@ -17,7 +21,7 @@ export default function AlphaAccessButton() {
   const handleAccessClick = async () => {
     // If already has access cookie, directly navigate
     if (hasAccessCookie()) {
-      redirect('/alpha');
+      router.push('/alpha');
       return;
     }
     
@@ -34,10 +38,12 @@ export default function AlphaAccessButton() {
       
       // Verify wallet has the required NFT
       const result = await verifyWalletAccess(walletAddress);
+      console.log("result: ", result);
       
       if (result.success) {
-        // Successfully verified and cookie should be set
-        redirect('/alpha');
+        // The cookie is now being set by the API response
+        // No need to manually set cookie here
+        router.push('/alpha');
       } else {
         setError(result.message || 'Access denied. You do not own the required NFT.');
       }
