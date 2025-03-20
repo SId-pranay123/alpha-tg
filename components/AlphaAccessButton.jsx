@@ -43,7 +43,9 @@ export default function AlphaAccessButton() {
       if (result.success) {
         // The cookie is now being set by the API response
         // No need to manually set cookie here
-        router.push('/alpha');
+        setTimeout(() => {
+          router.push('/alpha');
+        }, 1000);
       } else {
         setError(result.message || 'Access denied. You do not own the required NFT.');
       }
