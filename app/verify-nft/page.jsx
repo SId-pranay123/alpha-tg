@@ -1,9 +1,9 @@
 'use client';
-
+import React, { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import WalletConnector from '@/components/WalletConnector';
 
-export default function VerifyNFTPage() {
+function VerifyNFTPageContent() {
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get('redirect') || '/alpha';
   
@@ -44,4 +44,12 @@ export default function VerifyNFTPage() {
       </div>
     </div>
   );
+}
+
+export default function VerifyNFTPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+          <VerifyNFTPageContent />
+        </Suspense>
+    );
 }

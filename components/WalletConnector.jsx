@@ -6,7 +6,8 @@ import {
   connectPhantomWallet, 
   disconnectPhantomWallet,
   getConnectedWallet,
-  verifyNFTOwnership
+  verifyNFTOwnership,
+  isAuthenticated
 } from '@/lib/wallet';
 
 export default function WalletConnector({ redirectUrl, onSuccess }) {
@@ -15,6 +16,13 @@ export default function WalletConnector({ redirectUrl, onSuccess }) {
   const [wallet, setWallet] = useState(null);
   const [error, setError] = useState(null);
   const [hasPhantom, setHasPhantom] = useState(false);
+  
+  // Check if already authenticated
+  useEffect(() => {
+    if (isAuthenticated() && redirectUrl) {
+      window.location.href = redirectUrl;
+    }
+  }, [redirectUrl]);
   
   // Check for Phantom wallet on component mount
   useEffect(() => {
