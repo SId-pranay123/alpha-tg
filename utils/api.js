@@ -1,6 +1,6 @@
 export async function verifyWalletAccess(walletAddress) {
     try {
-      const response = await fetch('https://2090a7fe-token-gate-worker.siddharthpranay0.workers.dev//verify', {
+      const response = await fetch('https://token-gate-worker.siddharthpranay0.workers.dev/verify', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
