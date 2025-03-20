@@ -153,15 +153,29 @@ import { hasAccessCookie } from '../../utils/cookies';
 export default function Alpha() {
   const [authorized, setAuthorized] = useState(false);
   
+  // useEffect(() => {
+  //   // Client-side verification
+  //   if (!hasAccessCookie()) {
+  //     redirect('/verify-access');
+  //   } else {
+  //     setAuthorized(true);
+  //   }
+  // }, []);
+  
+
   useEffect(() => {
-    // Client-side verification
-    if (!hasAccessCookie()) {
-      redirect('/verify-access');
+    // Client-side verification with fallback
+    const hasAccess = hasAccessCookie();
+    // console.log("Checking alpha access:", hasAccess);
+    
+    if (!hasAccess) {
+      // console.log("No access, redirecting to verification");
+      window.location.href = '/verify-access'; // Use window.location for more reliable redirects
     } else {
       setAuthorized(true);
     }
   }, []);
-  
+
   if (!authorized) {
     return <div className="loading">Verifying access...</div>;
   }

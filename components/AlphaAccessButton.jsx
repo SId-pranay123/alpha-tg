@@ -38,14 +38,21 @@ export default function AlphaAccessButton() {
       
       // Verify wallet has the required NFT
       const result = await verifyWalletAccess(walletAddress);
-      console.log("result: ", result);
+      // console.log("result: ", result);
       
       if (result.success) {
-        // The cookie is now being set by the API response
-        // No need to manually set cookie here
+        localStorage.setItem('alpha_verified', 'true');
+  
+        // Add a longer delay to ensure the cookie is set before redirecting
         setTimeout(() => {
-          router.push('/alpha');
-        }, 1000);
+          if (hasAccessCookie() || localStorage.getItem('alpha_verified') === 'true') {
+            // console.log("Redirecting to alpha page");
+            window.location.href = '/alpha'; // Use window.location instead of router
+          } else {
+            // console.log("Cookie not found after verification");
+            setError("Authentication successful but session not established. Please try again.");
+          }
+        }, 1500); // Longer delay
       } else {
         setError(result.message || 'Access denied. You do not own the required NFT.');
       }

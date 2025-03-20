@@ -7,6 +7,20 @@ export function getCookie(name) {
     return null;
 }
 
+// utils/cookies.js
 export function hasAccessCookie() {
-    return getCookie('alpha_access') === 'true';
+    // console.log("All cookies:", document.cookie);
+    
+    // Check for the cookie
+    const cookies = document.cookie.split(';');
+    const alphaAccessCookie = cookies.find(cookie => 
+        cookie.trim().startsWith('alpha_access=')
+    );
+    
+    // Check localStorage as a fallback
+    const localStorageAccess = localStorage.getItem('alpha_verified') === 'true';
+    
+    // console.log("Cookie found:", !!alphaAccessCookie, "LocalStorage access:", localStorageAccess);
+    
+    return !!alphaAccessCookie || localStorageAccess;
 }
