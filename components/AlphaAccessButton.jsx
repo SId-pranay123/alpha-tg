@@ -1,14 +1,9 @@
-
 "use client";
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-
-import { hasAccessCookie } from '../utils/cookies';
 import { connectPhantomWallet, isPhantomInstalled } from '../utils/phantom';
 import { verifyWalletAccess } from '../utils/api';
 
 export default function AlphaAccessButton() {
-  const router = useRouter();
   const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState(null);
   const [phantomAvailable, setPhantomAvailable] = useState(false);
@@ -16,12 +11,17 @@ export default function AlphaAccessButton() {
   useEffect(() => {
     // Check if Phantom is available in browser
     setPhantomAvailable(isPhantomInstalled());
+    
+    // Clear any navigation flags
+    sessionStorage.removeItem('navigating_to_alpha');
+    sessionStorage.removeItem('navigating_to_verify');
   }, []);
   
   const handleAccessClick = async () => {
-    // If already has access cookie, directly navigate
-    if (hasAccessCookie()) {
-      router.push('/alpha');
+    // If already verified in localStorage, directly navigate
+    if (localStorage.getItem('alpha_verified') === 'true') {
+      console.log("Already verified, navigating to alpha");
+      window.location.href = '/alpha';
       return;
     }
     
@@ -35,24 +35,28 @@ export default function AlphaAccessButton() {
       }
       
       const walletAddress = await connectPhantomWallet();
+      console.log("Connected wallet:", walletAddress);
       
       // Verify wallet has the required NFT
       const result = await verifyWalletAccess(walletAddress);
-      // console.log("result: ", result);
+      console.log("Verification result:", result);
       
       if (result.success) {
-  
-        // Store success in localStorage as our primary method
+        console.log("Verification successful");
+        
+        // Store in localStorage - our primary auth method
         localStorage.setItem('alpha_verified', 'true');
-                
-        // Add a short pause then redirect
-        setTimeout(() => {
-          window.location.href = '/alpha';
-        }, 1500);
+        console.log("Set alpha_verified in localStorage");
+        
+        // Navigate to alpha page
+        console.log("Navigating to alpha page");
+        window.location.href = '/alpha';
       } else {
+        console.log("Verification failed:", result.message);
         setError(result.message || 'Access denied. You do not own the required NFT.');
       }
     } catch (err) {
+      console.error("Verification error:", err);
       setError(err.message || 'An error occurred during verification.');
     } finally {
       setIsVerifying(false);
@@ -103,7 +107,7 @@ export default function AlphaAccessButton() {
             rel="noopener noreferrer"
             className="inline-flex items-center text-white hover:text-violet-200 font-medium transition-colors"
           >
-             <p className="ml-1 h-4 w-4">Get Phantom</p>
+             <p className="ml-1">Get Phantom</p>
           </a>
         </div>
       )}

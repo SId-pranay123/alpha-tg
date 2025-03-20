@@ -1,83 +1,31 @@
-// 'use client';
-// import React, { Suspense } from 'react';
-// import { useSearchParams } from 'next/navigation';
-// import WalletConnector from '@/components/WalletConnector';
-
-// function VerifyNFTPageContent() {
-//   const searchParams = useSearchParams();
-//   const redirectUrl = searchParams.get('redirect') || '/alpha';
-  
-//   const handleVerificationSuccess = (result) => {
-//     // This function will be called after successful verification
-//     console.log('Verification successful, redirecting to:', result.redirect);
-//   };
-  
-//   return (
-//     <div className="container mx-auto px-4 max-w-md">
-//       <div className="bg-white p-6 rounded-lg shadow-md">
-//         <h1 className="text-2xl font-bold mb-4 text-center text-black">Verify NFT Ownership</h1>
-        
-//         <p className="text-gray-700 mb-6">
-//           To access premium alpha content, you need to verify that you own a SkyTrade Alpha NFT.
-//           Please connect your Phantom wallet that contains the NFT to continue.
-//         </p>
-        
-//         <WalletConnector 
-//           redirectUrl={redirectUrl}
-//           onSuccess={handleVerificationSuccess}
-//         />
-        
-//         <div className="mt-6 pt-6 border-t border-gray-200">
-//           <h2 className="text-lg font-semibold mb-2 text-black">Don't have the NFT yet?</h2>
-//           <p className="text-gray-600 mb-4">
-//             You can purchase a SkyTrade Alpha NFT on Magic Eden marketplace to get access to our premium content.
-//           </p>
-//           <a 
-//             href="https://magiceden.io/" 
-//             target="_blank" 
-//             rel="noreferrer"
-//             className="block text-center px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
-//           >
-//             Buy on Magic Eden
-//           </a>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default function VerifyNFTPage() {
-//     return (
-//         <Suspense fallback={<div>Loading...</div>}>
-//           <VerifyNFTPageContent />
-//         </Suspense>
-//     );
-// }
-
 "use client";
 
 import { useEffect, useState } from 'react';
-import { redirect } from 'next/navigation';
 import Head from 'next/head';
-import { hasAccessCookie } from '../../utils/cookies';
 import AlphaAccessButton from '../../components/AlphaAccessButton';
 
 export default function VerifyAccess() {
   const [checking, setChecking] = useState(true);
-  const [redirectAttempted, setRedirectAttempted] = useState(false);
-
   
   useEffect(() => {
-    // Check if already has access, redirect if so
-    const hasLocalAccess = localStorage.getItem('alpha_verified') === 'true';
+    // Simple check for localStorage auth
+    const isAuthorized = localStorage.getItem('alpha_verified') === 'true';
     
-    if (hasLocalAccess && !redirectAttempted) {
-      setRedirectAttempted(true);
-      window.location.href = '/alpha';
-    } else {
-      setChecking(false);
+    if (isAuthorized) {
+      // Direct navigation with a flag to prevent reload loops
+      if (!sessionStorage.getItem('navigating_to_alpha')) {
+        sessionStorage.setItem('navigating_to_alpha', 'true');
+        window.location.href = '/alpha';
+        return;
+      }
     }
-  }, [redirectAttempted]);
+    
+    // If we're still here, we need verification
+    setChecking(false);
+    // Clear navigation flags
+    sessionStorage.removeItem('navigating_to_alpha');
+    sessionStorage.removeItem('navigating_to_verify');
+  }, []);
   
   if (checking) {
     return (
@@ -95,7 +43,6 @@ export default function VerifyAccess() {
       <Head>
         <title>Verify Access | SkyTrade Alpha</title>
       </Head>
-      
       
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-2xl mx-auto">
