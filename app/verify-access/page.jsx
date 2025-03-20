@@ -92,18 +92,6 @@ export default function VerifyAccess() {
         <title>Verify Access | SkyTrade Alpha</title>
       </Head>
       
-      <header className="border-b border-gray-800 py-4">
-        <div className="container mx-auto px-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">SkyTrade Alpha</h1>
-          <nav className="flex space-x-6">
-            <a href="/" className="hover:text-purple-400 transition">Home</a>
-            <a href="/about" className="hover:text-purple-400 transition">About</a>
-            <a href="/alpha-content" className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded transition">
-              Alpha Content
-            </a>
-          </nav>
-        </div>
-      </header>
       
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-2xl mx-auto">
