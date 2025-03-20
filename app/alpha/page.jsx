@@ -7,23 +7,47 @@ export default function Alpha() {
   const [authorized, setAuthorized] = useState(false);
   
   useEffect(() => {
-    // Check only localStorage for auth status
+    // Check localStorage for auth status and log values for debugging
     const isAuthorized = localStorage.getItem('alpha_verified') === 'true';
+    console.log("Alpha page - auth check:", isAuthorized);
+    console.log("localStorage values:", {
+      alpha_verified: localStorage.getItem('alpha_verified'),
+      current_wallet_address: localStorage.getItem('current_wallet_address'),
+      verification_timestamp: localStorage.getItem('verification_timestamp')
+    });
     
     if (!isAuthorized) {
+      console.log("Not authorized, redirecting to verification");
+      
       // Set flag to prevent redirect loops
       if (!sessionStorage.getItem('navigating_to_verify')) {
         sessionStorage.setItem('navigating_to_verify', 'true');
-        window.location.href = '/verify-access';
+        // Use replace for cleaner navigation
+        window.location.replace('/verify-access');
         return;
       }
     }
     
     // If we're still here, we're authorized
+    console.log("Authorized, showing alpha content");
     setAuthorized(true);
+    
     // Clear navigation flags
     sessionStorage.removeItem('navigating_to_alpha');
     sessionStorage.removeItem('navigating_to_verify');
+    
+    // Reload phantom wallet listener to ensure it's active
+    const checkPhantom = async () => {
+      if (typeof window !== 'undefined' && window.solana && window.solana.isPhantom) {
+        // Import dynamically to avoid SSR issues
+        const { setupWalletChangeListener } = await import('../../utils/phantom');
+        if (typeof setupWalletChangeListener === 'function') {
+          setupWalletChangeListener();
+        }
+      }
+    };
+    
+    checkPhantom().catch(console.error);
   }, []);
   
   if (!authorized) {
@@ -60,6 +84,7 @@ export default function Alpha() {
             Thank you for being a valued NFT holder. You now have exclusive access to our premium content and trading insights.
           </p>
         </div>
+        
         
       </main>
     </div>

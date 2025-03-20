@@ -21,7 +21,7 @@ export default function AlphaAccessButton() {
     // If already verified in localStorage, directly navigate
     if (localStorage.getItem('alpha_verified') === 'true') {
       console.log("Already verified, navigating to alpha");
-      window.location.href = '/alpha';
+      window.location.replace('/alpha'); // Use replace for more reliable navigation
       return;
     }
     
@@ -46,11 +46,14 @@ export default function AlphaAccessButton() {
         
         // Store in localStorage - our primary auth method
         localStorage.setItem('alpha_verified', 'true');
+        localStorage.setItem('verification_timestamp', Date.now().toString());
         console.log("Set alpha_verified in localStorage");
         
         // Navigate to alpha page
         console.log("Navigating to alpha page");
-        window.location.href = '/alpha';
+        setTimeout(() => {
+          window.location.replace('/alpha'); // Use replace and a short timeout
+        }, 100);
       } else {
         console.log("Verification failed:", result.message);
         setError(result.message || 'Access denied. You do not own the required NFT.');
