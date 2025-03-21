@@ -10,7 +10,7 @@ export default function Footer() {
             </div>
             <div>
               <a 
-                href="https://magiceden.io/" 
+                href="https://magiceden.io/marketplace/skytrade_genesis" 
                 target="_blank" 
                 rel="noreferrer"
                 className="text-sm text-blue-400 hover:text-blue-300"
