@@ -85,14 +85,14 @@ export default function Alpha() {
           </div>
           <h1 className="text-3xl font-bold text-white">SkyTrade Alpha Insights</h1>
           <p className="text-gray-300 mt-2">
-            Exclusive trading signals and market analysis for NFT holders
+            Exclusive contents and analysis for NFT holders
           </p>
         </div>
         
         <div className="bg-purple-800 bg-opacity-20 border border-purple-700 rounded-lg p-6 mb-8">
           <h2 className="text-xl font-semibold text-white mb-2">Welcome to Alpha Access</h2>
           <p className="text-purple-100">
-            Thank you for being a valued NFT holder. You now have exclusive access to our premium content and trading insights.
+            Thank you for being a valued NFT holder. You now have exclusive access to our premium content and insights.
           </p>
         </div>
         
