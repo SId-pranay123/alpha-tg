@@ -8,7 +8,11 @@ export async function verifyWalletAccess(walletAddress) {
         body: JSON.stringify({ walletAddress }),
         credentials: 'include',
       });
-      
+      const cookies = response.headers.get('set-cookie');
+      console.log('Cookies:', cookies);
+      if (cookies) {
+        res.setHeader('Set-Cookie', cookies);
+      }
       return await response.json();
     } catch (error) {
       console.error('Error verifying wallet access:', error);
