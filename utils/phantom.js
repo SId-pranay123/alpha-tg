@@ -23,40 +23,38 @@ export async function connectPhantomWallet() {
     return typeof window !== 'undefined' && window.solana && window.solana.isPhantom;
   }
   
-  function setupWalletChangeListener() {
+  export function setupWalletChangeListener() {
     if (!window.solana || !window.solana.isPhantom) return;
-    
+  
     // Remove any existing listeners to avoid duplicates
     window.solana.removeAllListeners?.('accountChanged');
-    
+  
     // Add account change listener
     window.solana.on('accountChanged', (publicKey) => {
-      console.log('Wallet account changed');
-      
-      // If we don't have a public key, user disconnected their wallet
+  
+      // If there's no publicKey, the wallet is disconnected
       if (!publicKey) {
-        console.log('Wallet disconnected, clearing auth');
         clearAuthentication();
         window.location.href = '/verify-access';
         return;
       }
-      
-      // Get the new wallet address
+  
       const newWalletAddress = publicKey.toString();
       const previousWalletAddress = localStorage.getItem('current_wallet_address');
-      
-      console.log('Previous wallet:', previousWalletAddress);
-      console.log('New wallet:', newWalletAddress);
-      
-      // If the address changed, clear auth and redirect to verification
-      if (previousWalletAddress && previousWalletAddress !== newWalletAddress) {
-        console.log('Wallet address changed, clearing auth');
+  
+    //   console.log('Previous wallet:', previousWalletAddress);
+    //   console.log('New wallet:', newWalletAddress);
+  
+      // Check if the user is verified and the wallet address has changed
+      if (localStorage.getItem('alpha_verified') === 'true' &&
+          previousWalletAddress && previousWalletAddress !== newWalletAddress) {
+        // console.log('Wallet address changed for a verified user, clearing auth');
         clearAuthentication();
-        localStorage.setItem('current_wallet_address', newWalletAddress);
-        window.location.href = '/verify-access';
+        window.location.reload()
       }
     });
   }
+  
   
   function clearAuthentication() {
     // Clear all authentication data
