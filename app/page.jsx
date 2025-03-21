@@ -1,4 +1,3 @@
-// src/app/page.js - Updated with improved styling
 
 export default function Home() {
   return (

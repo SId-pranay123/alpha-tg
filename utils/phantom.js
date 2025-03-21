@@ -22,46 +22,98 @@ export async function connectPhantomWallet() {
   export function isPhantomInstalled() {
     return typeof window !== 'undefined' && window.solana && window.solana.isPhantom;
   }
+
+    export function setupWalletChangeListener() {
+        if (!window.solana || !window.solana.isPhantom) return;
+    
+        // Clean up any existing polling interval
+        if (window._phantomPollingInterval) {
+        clearInterval(window._phantomPollingInterval);
+        window._phantomPollingInterval = null;
+        }
+    
+        // Store the current wallet address for comparison
+        const getCurrentWalletAddress = async () => {
+        try {
+            const resp = await window.solana.connect({ onlyIfTrusted: true });
+            return resp.publicKey.toString();
+        } catch (err) {
+            console.log("Error getting current wallet:", err);
+            return null;
+        }
+        };
+    
+        // Setup polling for account changes
+        const checkAccountChange = async () => {
+        const currentWalletAddress = await getCurrentWalletAddress();
+        const storedWalletAddress = localStorage.getItem('current_wallet_address');
+        
+        if (!currentWalletAddress) {
+            // Wallet disconnected
+            if (localStorage.getItem('alpha_verified') === 'true') {
+            console.log('Wallet disconnected, clearing auth');
+            clearAuthentication();
+            window.location.href = '/verify-access';
+            }
+            return;
+        }
+        
+        if (storedWalletAddress && storedWalletAddress !== currentWalletAddress) {
+            console.log('Wallet address changed from', storedWalletAddress, 'to', currentWalletAddress);
+            
+            if (localStorage.getItem('alpha_verified') === 'true') {
+            console.log('Clearing auth due to wallet change');
+            clearAuthentication();
+            window.location.href = '/verify-access';
+            } else {
+            // Update the stored wallet address
+            localStorage.setItem('current_wallet_address', currentWalletAddress);
+            }
+        }
+        };
+        
+        // Run initial check
+        checkAccountChange();
+        
+        // Set up interval for polling
+        const pollingInterval = setInterval(checkAccountChange, 2000); // Check every 2 seconds
+        window._phantomPollingInterval = pollingInterval;
+        
+        // Try to use accountChanged event as a backup
+        try {
+        window.solana.on('accountChanged', (publicKey) => {
+            console.log('accountChanged event triggered', publicKey);
+            checkAccountChange();
+        });
+        } catch (err) {
+        console.log('Error adding accountChanged listener:', err);
+        }
+        
+        // Return a cleanup function
+        return () => {
+        if (window._phantomPollingInterval) {
+            clearInterval(window._phantomPollingInterval);
+            window._phantomPollingInterval = null;
+        }
+        
+        try {
+            window.solana.removeAllListeners?.('accountChanged');
+        } catch (err) {
+            console.log('Error removing accountChanged listener:', err);
+        }
+        };
+    }
   
-  export function setupWalletChangeListener() {
-    if (!window.solana || !window.solana.isPhantom) return;
-  
-    // Remove any existing listeners to avoid duplicates
-    window.solana.removeAllListeners?.('accountChanged');
-  
-    // Add account change listener
-    window.solana.on('accountChanged', (publicKey) => {
-  
-      // If there's no publicKey, the wallet is disconnected
-      if (!publicKey) {
-        clearAuthentication();
-        window.location.href = '/verify-access';
-        return;
-      }
-  
-      const newWalletAddress = publicKey.toString();
-      const previousWalletAddress = localStorage.getItem('current_wallet_address');
-  
-    //   console.log('Previous wallet:', previousWalletAddress);
-    //   console.log('New wallet:', newWalletAddress);
-  
-      // Check if the user is verified and the wallet address has changed
-      if (localStorage.getItem('alpha_verified') === 'true' &&
-          previousWalletAddress && previousWalletAddress !== newWalletAddress) {
-        // console.log('Wallet address changed for a verified user, clearing auth');
-        clearAuthentication();
-        window.location.reload()
-      }
-    });
-  }
   
   
   function clearAuthentication() {
     // Clear all authentication data
     localStorage.removeItem('alpha_verified');
     localStorage.removeItem('current_wallet_address');
+    localStorage.removeItem('verification_timestamp');
     
     // Clear any session flags
     sessionStorage.removeItem('navigating_to_alpha');
     sessionStorage.removeItem('navigating_to_verify');
   }
+  

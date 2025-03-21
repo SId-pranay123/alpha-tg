@@ -5,47 +5,73 @@ import Head from 'next/head';
 
 export default function Alpha() {
   const [authorized, setAuthorized] = useState(false);
-  
+  //   // Check localStorage for auth status and log values for debugging
+  //   const isAuthorized = localStorage.getItem('alpha_verified') === 'true';
+    
+  //   if (!isAuthorized) {
+  //     // console.log("Not authorized, redirecting to verification");
+      
+  //     // Set flag to prevent redirect loops
+  //     if (!sessionStorage.getItem('navigating_to_verify')) {
+  //       sessionStorage.setItem('navigating_to_verify', 'true');
+  //       // Use replace for cleaner navigation
+  //       window.location.replace('/verify-access');
+  //       return;
+  //     }
+  //   }
+  //   setAuthorized(true);
+    
+  //   // Clear navigation flags
+  //   sessionStorage.removeItem('navigating_to_alpha');
+  //   sessionStorage.removeItem('navigating_to_verify');
+  //   const checkPhantom = async () => {
+  //     if (typeof window !== 'undefined' && window.solana && window.solana.isPhantom) {
+  //       // Import dynamically to avoid SSR issues
+  //       try {
+  //         const { setupWalletChangeListener } = await import('../../utils/phantom');
+  //         if (typeof setupWalletChangeListener === 'function') {
+  //           setupWalletChangeListener();
+  //         } else {
+  //           console.error("setupWalletChangeListener is not a function");
+  //         }
+  //       } catch (error) {
+  //         console.error("Error importing phantom utils:", error);
+  //       }
+  //     } else {
+  //       console.log("Phantom wallet is not available");
+  //     }
+  //   };
+    
+  //   checkPhantom().catch(console.error);
+  // }, []);
+
   useEffect(() => {
-    // Check localStorage for auth status and log values for debugging
+    // Check localStorage for auth status
     const isAuthorized = localStorage.getItem('alpha_verified') === 'true';
-    // console.log("Alpha page - auth check:", isAuthorized);
-    // console.log("localStorage values:", {
-    //   alpha_verified: localStorage.getItem('alpha_verified'),
-    //   current_wallet_address: localStorage.getItem('current_wallet_address'),
-    //   verification_timestamp: localStorage.getItem('verification_timestamp')
-    // });
     
     if (!isAuthorized) {
-      // console.log("Not authorized, redirecting to verification");
-      
       // Set flag to prevent redirect loops
       if (!sessionStorage.getItem('navigating_to_verify')) {
         sessionStorage.setItem('navigating_to_verify', 'true');
-        // Use replace for cleaner navigation
         window.location.replace('/verify-access');
         return;
       }
     }
-    
-    // If we're still here, we're authorized
-    // console.log("Authorized, showing alpha content");
     setAuthorized(true);
     
     // Clear navigation flags
     sessionStorage.removeItem('navigating_to_alpha');
     sessionStorage.removeItem('navigating_to_verify');
     
-    // Reload phantom wallet listener to ensure it's active
+    // Variable to store cleanup function
+    let cleanup = null;
+    
     const checkPhantom = async () => {
       if (typeof window !== 'undefined' && window.solana && window.solana.isPhantom) {
-        // Import dynamically to avoid SSR issues
         try {
           const { setupWalletChangeListener } = await import('../../utils/phantom');
-          // console.log("Imported setupWalletChangeListener function");
           if (typeof setupWalletChangeListener === 'function') {
-            // console.log("Setting up wallet change listener");
-            setupWalletChangeListener();
+            cleanup = setupWalletChangeListener();
           } else {
             console.error("setupWalletChangeListener is not a function");
           }
@@ -57,9 +83,17 @@ export default function Alpha() {
       }
     };
     
-    
     checkPhantom().catch(console.error);
+    
+    // Return cleanup function for useEffect
+    return () => {
+      if (typeof cleanup === 'function') {
+        cleanup();
+      }
+    };
   }, []);
+  
+
   
   if (!authorized) {
     return (
