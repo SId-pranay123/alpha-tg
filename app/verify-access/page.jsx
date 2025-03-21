@@ -66,7 +66,7 @@ export default function VerifyAccess() {
                 You can purchase a SkyTrade Alpha NFT on Magic Eden marketplace to get access to our premium content.
               </p>
               <a 
-                href="https://magiceden.io/" 
+                href="https://magiceden.io/marketplace/skytrade_genesis" 
                 target="_blank" 
                 rel="noreferrer"
                 className="block w-full text-center py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium transition"
